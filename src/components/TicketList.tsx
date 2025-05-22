@@ -1,15 +1,33 @@
-
 import React from "react";
 import { Badge } from "@/components/ui/badge";
+
+interface Product {
+  code: string;
+  name: string;
+  description: string;
+  image: string;
+  mrp?: number;
+  rrp?: number;
+}
 
 export interface Ticket {
   id: string;
   templateName: string;
-  title: string;
+  storeCode: string;
+  employeeId: string;
   description: string;
   status: "Pending" | "Approved" | "Rejected";
   createdAt: string;
   images?: string[];
+  // Count Correction fields
+  product?: Product;
+  newCount?: number;
+  // Price Correction fields
+  newMrp?: number;
+  // Imprest Submission fields
+  expenseTitle?: string;
+  expenseAmount?: number;
+  expensePurpose?: string;
 }
 
 interface TicketListProps {
@@ -56,13 +74,13 @@ const TicketList: React.FC<TicketListProps> = ({ tickets, onTicketClick, type })
           onClick={() => onTicketClick(ticket)}
         >
           <div className="flex justify-between items-start mb-1">
-            <h3 className="font-medium text-gray-900">{ticket.title}</h3>
+            <h3 className="font-medium text-gray-900">{ticket.templateName}</h3>
             <Badge className={`${getStatusColor(ticket.status)} border-0`}>
               {ticket.status}
             </Badge>
           </div>
           <p className="text-sm text-gray-500 mb-1 line-clamp-1">
-            {ticket.templateName}
+            {ticket.storeCode} • {ticket.employeeId}
           </p>
           <div className="flex justify-between items-center">
             <p className="text-xs text-gray-400">

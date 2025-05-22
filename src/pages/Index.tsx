@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Header from "@/components/Header";
@@ -23,12 +22,6 @@ const Icons = {
   Imprest: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg>
   ),
-  Consumables: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-truck"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18h2a1 1 0 0 0 1-1v-3h3l3-4.5V8a2 2 0 0 0-2-2h-6a2 2 0 0 0-2 2v8"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
-  ),
-  Inventory: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-list"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
-  ),
   Other: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-cube"><path d="m21 7.5-9-5.25L3 7.5m18 0v9l-9 5.25m9-14.25-9 5.25m0 0-9-5.25m9 5.25v9"/></svg>
   )
@@ -38,9 +31,7 @@ const ticketTemplates = [
   { id: 1, name: "Count Correction", icon: <Icons.CountCorrection /> },
   { id: 2, name: "Markdown Request", icon: <Icons.Markdown /> },
   { id: 3, name: "Imprest Submission", icon: <Icons.Imprest /> },
-  { id: 4, name: "Consumables Request", icon: <Icons.Consumables /> },
-  { id: 5, name: "Inventory Adjustment", icon: <Icons.Inventory /> },
-  { id: 6, name: "Other Request", icon: <Icons.Other /> }
+  { id: 4, name: "Other Request", icon: <Icons.Other /> }
 ];
 
 // Sample ticket data with proper status types
@@ -48,26 +39,48 @@ const initialTickets: Ticket[] = [
   {
     id: "1",
     templateName: "Count Correction",
-    title: "Inventory Count Error - SKU12345",
+    storeCode: "STORE001",
+    employeeId: "EMP001",
     description: "System shows 10 units but actual count is 8 units.",
-    status: "Pending" as "Pending" | "Approved" | "Rejected", // Type assertion for TypeScript
-    createdAt: "2023-05-15T10:30:00Z"
+    status: "Pending",
+    createdAt: "2023-05-15T10:30:00Z",
+    product: {
+      code: "P001",
+      name: "Product 1",
+      description: "Description for Product 1",
+      image: "https://via.placeholder.com/150"
+    },
+    newCount: 8
   },
   {
     id: "2",
     templateName: "Markdown Request",
-    title: "Clearance Items - Summer Collection",
-    description: "Request to mark down summer collection by 30%",
-    status: "Approved" as "Pending" | "Approved" | "Rejected", // Type assertion for TypeScript
-    createdAt: "2023-05-12T08:15:00Z"
+    storeCode: "STORE001",
+    employeeId: "EMP001",
+    description: "Request to update MRP for summer collection",
+    status: "Approved",
+    createdAt: "2023-05-12T08:15:00Z",
+    product: {
+      code: "P002",
+      name: "Product 2",
+      description: "Description for Product 2",
+      image: "https://via.placeholder.com/150",
+      mrp: 100,
+      rrp: 90
+    },
+    newMrp: 120
   },
   {
     id: "3",
-    templateName: "Consumables Request",
-    title: "Receipt Paper Restock",
-    description: "Need additional receipt paper rolls for all POS terminals",
-    status: "Rejected" as "Pending" | "Approved" | "Rejected", // Type assertion for TypeScript
-    createdAt: "2023-05-10T14:45:00Z"
+    templateName: "Imprest Submission",
+    storeCode: "STORE001",
+    employeeId: "EMP001",
+    description: "Office supplies purchase",
+    status: "Rejected",
+    createdAt: "2023-05-10T14:45:00Z",
+    expenseTitle: "Office Supplies",
+    expenseAmount: 500,
+    expensePurpose: "Purchase of stationery items"
   }
 ];
 
@@ -80,6 +93,12 @@ const Index = () => {
   const [selectedTickets, setSelectedTickets] = useState<string[]>([]);
   const [bulkSelectionMode, setBulkSelectionMode] = useState(false);
 
+  // Add debug logging for template selection
+  useEffect(() => {
+    console.log('Current template selection:', selectedTemplate);
+    console.log('Active tab:', activeTab);
+  }, [selectedTemplate, activeTab]);
+
   // Filter tickets based on the active tab
   const filteredTickets = tickets.filter((ticket) => {
     if (activeTab === "my-tickets") {
@@ -90,20 +109,49 @@ const Index = () => {
     return false;
   });
 
+  const handleTemplateSelect = (templateName: string) => {
+    console.log('Template selected:', templateName);
+    setSelectedTemplate(templateName);
+  };
+
   const handleTicketSubmit = (data: any) => {
+    console.log('Submitting ticket with data:', data); // Debug log
+
     const newTicket: Ticket = {
       id: uuidv4(),
       templateName: data.templateName,
-      title: data.title,
+      storeCode: "STORE001", // This should come from user context/state
+      employeeId: "EMP001", // This should come from user context/state
       description: data.description,
-      status: "Pending" as "Pending" | "Approved" | "Rejected", // Fixed! Using type assertion to match Ticket interface
+      status: "Pending",
       createdAt: new Date().toISOString(),
-      images: data.images
+      images: data.images,
+      // Add specific fields based on ticket type
+      ...(data.product && { product: data.product }),
+      ...(data.newCount && { newCount: data.newCount }),
+      ...(data.newMrp && { newMrp: data.newMrp }),
+      ...(data.expenseTitle && { 
+        expenseTitle: data.expenseTitle,
+        expenseAmount: data.expenseAmount,
+        expensePurpose: data.expensePurpose
+      })
     };
 
-    setTickets([newTicket, ...tickets]);
+    console.log('Created new ticket:', newTicket); // Debug log
+    
+    setTickets(prevTickets => {
+      const updatedTickets = [newTicket, ...prevTickets];
+      console.log('Updated tickets state:', updatedTickets); // Debug log
+      return updatedTickets;
+    });
+    
     setSelectedTemplate(null);
     setActiveTab("my-tickets");
+
+    toast({
+      title: "Success",
+      description: "Ticket submitted successfully",
+    });
   };
 
   const handleTicketClick = (ticket: Ticket) => {
@@ -172,7 +220,7 @@ const Index = () => {
                   key={template.id}
                   icon={template.icon}
                   title={template.name}
-                  onClick={() => setSelectedTemplate(template.name)}
+                  onClick={() => handleTemplateSelect(template.name)}
                 />
               ))}
             </div>
@@ -181,11 +229,19 @@ const Index = () => {
 
         {/* Ticket Form */}
         {activeTab === "submit" && selectedTemplate && (
-          <TicketForm
-            templateName={selectedTemplate}
-            onBack={() => setSelectedTemplate(null)}
-            onSubmit={handleTicketSubmit}
-          />
+          <div className="animate-fade-in">
+            <TicketForm
+              key={selectedTemplate} // Add key to force re-render
+              templateName={selectedTemplate}
+              onBack={() => {
+                console.log('Going back from template:', selectedTemplate);
+                setSelectedTemplate(null);
+              }}
+              onSubmit={handleTicketSubmit}
+              storeCode="STORE001"
+              employeeId="EMP001"
+            />
+          </div>
         )}
 
         {/* My Tickets Tab */}
@@ -229,8 +285,8 @@ const Index = () => {
                       className="flex-1"
                       onClick={() => toggleTicketSelection(ticket.id)}
                     >
-                      <h3 className="font-medium text-gray-900 mb-1">{ticket.title}</h3>
-                      <p className="text-sm text-gray-500">{ticket.templateName}</p>
+                      <h3 className="font-medium text-gray-900 mb-1">{ticket.templateName}</h3>
+                      <p className="text-sm text-gray-500">{ticket.storeCode} • {ticket.employeeId}</p>
                     </div>
                   </div>
                 ))}
@@ -270,5 +326,30 @@ const Index = () => {
     </div>
   );
 };
+
+// Add this CSS animation
+const styles = `
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+`;
+
+// Add the styles to the document
+if (typeof document !== 'undefined') {
+  const styleSheet = document.createElement("style");
+  styleSheet.textContent = styles;
+  document.head.appendChild(styleSheet);
+}
 
 export default Index;

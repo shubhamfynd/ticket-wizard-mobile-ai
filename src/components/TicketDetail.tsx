@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -74,6 +73,86 @@ const TicketDetail: React.FC<TicketDetailProps> = ({
     }
   };
 
+  const renderTicketContent = () => {
+    switch (ticket.templateName) {
+      case "Count Correction":
+        return (
+          <>
+            <div className="bg-gray-50 p-4 rounded-md mb-4">
+              <div className="flex gap-4">
+                <img 
+                  src={ticket.product?.image} 
+                  alt={ticket.product?.name}
+                  className="w-20 h-20 object-cover rounded-md"
+                />
+                <div>
+                  <h4 className="font-medium">{ticket.product?.name}</h4>
+                  <p className="text-sm text-gray-600">{ticket.product?.description}</p>
+                </div>
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-500">New Count</label>
+              <p className="text-lg font-medium">{ticket.newCount}</p>
+            </div>
+          </>
+        );
+
+      case "Markdown Request":
+        return (
+          <>
+            <div className="bg-gray-50 p-4 rounded-md mb-4">
+              <div className="flex gap-4">
+                <img 
+                  src={ticket.product?.image} 
+                  alt={ticket.product?.name}
+                  className="w-20 h-20 object-cover rounded-md"
+                />
+                <div>
+                  <h4 className="font-medium">{ticket.product?.name}</h4>
+                  <p className="text-sm text-gray-600">{ticket.product?.description}</p>
+                  <div className="mt-2 text-sm">
+                    <p>Current MRP: ₹{ticket.product?.mrp}</p>
+                    <p>Current RRP: ₹{ticket.product?.rrp}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-500">New MRP</label>
+              <p className="text-lg font-medium">₹{ticket.newMrp}</p>
+            </div>
+          </>
+        );
+
+      case "Imprest Submission":
+        return (
+          <>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-500">Expense Title</label>
+              <p className="text-lg font-medium">{ticket.expenseTitle}</p>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-500">Expense Amount</label>
+              <p className="text-lg font-medium">₹{ticket.expenseAmount}</p>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-500">Purpose</label>
+              <p className="text-gray-600">{ticket.expensePurpose}</p>
+            </div>
+          </>
+        );
+
+      default:
+        return (
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-500">Description</label>
+            <p className="text-gray-600">{ticket.description}</p>
+          </div>
+        );
+    }
+  };
+
   return (
     <div className="p-4">
       <div className="flex items-center mb-4">
@@ -95,8 +174,25 @@ const TicketDetail: React.FC<TicketDetailProps> = ({
           </Badge>
         </div>
 
-        <h3 className="font-medium text-gray-900 mb-2">{ticket.title}</h3>
-        <p className="text-gray-600 mb-4">{ticket.description}</p>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-500">Store Code</label>
+            <p className="text-sm">{ticket.storeCode}</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-500">Employee ID</label>
+            <p className="text-sm">{ticket.employeeId}</p>
+          </div>
+        </div>
+
+        {renderTicketContent()}
+
+        {ticket.description && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-500">Additional Details</label>
+            <p className="text-gray-600">{ticket.description}</p>
+          </div>
+        )}
 
         <p className="text-xs text-gray-400 mb-4">
           Submitted on {formatDate(ticket.createdAt)}
