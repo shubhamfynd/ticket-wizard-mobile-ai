@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Header from "@/components/Header";
@@ -95,7 +96,7 @@ const Index = () => {
       templateName: data.templateName,
       title: data.title,
       description: data.description,
-      status: "Pending",
+      status: "Pending" as "Pending" | "Approved" | "Rejected", // Fixed! Using type assertion to match Ticket interface
       createdAt: new Date().toISOString(),
       images: data.images
     };
@@ -113,10 +114,10 @@ const Index = () => {
     }
   };
 
-  const handleStatusChange = (ticketId: string, status: string, comment?: string) => {
+  const handleStatusChange = (ticketId: string, newStatus: "Pending" | "Approved" | "Rejected", comment?: string) => {
     setTickets(
       tickets.map((ticket) =>
-        ticket.id === ticketId ? { ...ticket, status } : ticket
+        ticket.id === ticketId ? { ...ticket, status: newStatus } : ticket
       )
     );
     setViewingTicket(null);
@@ -134,7 +135,7 @@ const Index = () => {
     setTickets(
       tickets.map((ticket) =>
         selectedTickets.includes(ticket.id) 
-          ? { ...ticket, status: "Approved" } 
+          ? { ...ticket, status: "Approved" as "Pending" | "Approved" | "Rejected" } 
           : ticket
       )
     );
