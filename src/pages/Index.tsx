@@ -43,7 +43,7 @@ const ticketTemplates = [
   { id: 6, name: "Other Request", icon: <Icons.Other /> }
 ];
 
-// Sample ticket data
+// Sample ticket data with proper status types
 const initialTickets: Ticket[] = [
   {
     id: "1",
