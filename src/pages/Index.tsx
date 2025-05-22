@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Header from "@/components/Header";
@@ -27,7 +26,7 @@ const Icons = {
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-truck"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18h2a1 1 0 0 0 1-1v-3h3l3-4.5V8a2 2 0 0 0-2-2h-6a2 2 0 0 0-2 2v8"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
   ),
   Inventory: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-list"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-list"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
   ),
   Other: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-cube"><path d="m21 7.5-9-5.25L3 7.5m18 0v9l-9 5.25m9-14.25-9 5.25m0 0-9-5.25m9 5.25v9"/></svg>
@@ -50,7 +49,7 @@ const initialTickets: Ticket[] = [
     templateName: "Count Correction",
     title: "Inventory Count Error - SKU12345",
     description: "System shows 10 units but actual count is 8 units.",
-    status: "Pending",
+    status: "Pending" as "Pending" | "Approved" | "Rejected", // Type assertion for TypeScript
     createdAt: "2023-05-15T10:30:00Z"
   },
   {
@@ -58,7 +57,7 @@ const initialTickets: Ticket[] = [
     templateName: "Markdown Request",
     title: "Clearance Items - Summer Collection",
     description: "Request to mark down summer collection by 30%",
-    status: "Approved",
+    status: "Approved" as "Pending" | "Approved" | "Rejected", // Type assertion for TypeScript
     createdAt: "2023-05-12T08:15:00Z"
   },
   {
@@ -66,7 +65,7 @@ const initialTickets: Ticket[] = [
     templateName: "Consumables Request",
     title: "Receipt Paper Restock",
     description: "Need additional receipt paper rolls for all POS terminals",
-    status: "Rejected",
+    status: "Rejected" as "Pending" | "Approved" | "Rejected", // Type assertion for TypeScript
     createdAt: "2023-05-10T14:45:00Z"
   }
 ];
